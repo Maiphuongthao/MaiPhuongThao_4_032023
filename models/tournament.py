@@ -1,5 +1,6 @@
 import datetime
 import json
+from pathlib import Path
 from round import Round
 from player import Player
 
@@ -36,6 +37,9 @@ class Tournament:
     def __str__(self) -> str:
         pass
 
+    def create_player():
+        pass
+
     def get_serialized_tournaments(self):
         serialized_tournaments = {
             "name": self.name,
@@ -48,4 +52,21 @@ class Tournament:
             "description": self.description,
             "number_of_rounds": self.number_of_rounds,
         }
-        return json.dumps(serialized_tournaments)
+        return serialized_tournaments
+
+    def sort_players_by_rank(self):
+        self.players = sorted(self.players, key=lambda x: x.get("rank"))
+
+    def save_tournament(self):
+        """
+        save tournaments to database
+        """
+        file_name = "tournaments.json"
+        file_path = Path("database")
+
+        if not Path(file_path).exists():
+            Path.mkdir(file_path)
+
+        path = file_path.joinpath(file_name)
+        with open(path, "a") as file:
+            json.dump(self.get_serialized_tournaments(), file, indent=4)

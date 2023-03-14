@@ -29,6 +29,15 @@ class Round:
     def __str__(self) -> str:
         pass
 
+    def set_round(self):
+        """
+        return round to a list
+        """
+        return [self.name, self.start_date_time, self.end_date_time, self.matchs]
+
+    def get_list_of_matchs(self):
+        self.matchs.append(Match.create_pairs())
+
     def get_serialized_round(self):
         serialized_round = {
             "name": self.name,
