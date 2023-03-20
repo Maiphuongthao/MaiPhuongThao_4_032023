@@ -1,4 +1,4 @@
-import json
+from tinydb import TinyDB, where
 from pathlib import Path
 
 
@@ -39,7 +39,10 @@ class Player:
         }
         return serialized_player
 
-    def save_player(self):
+    def save_player_data(self):
+        """
+        save user data to json file
+        """
         file_name = "players.json"
         file_path = Path("database")
 
@@ -47,24 +50,27 @@ class Player:
             Path.mkdir(file_path)
 
         path = file_path.joinpath(file_name)
-        with open(path, "a") as file:
-            json.dump(
-                self.get_serialized_player(),
-                file,
-                indent=4,
-            )
+        data = TinyDB(path)
+        data.insert(self.get_serialized_player())
 
-    def update_player(self):
-        file = "database/players.json"
-        with open(file, "r+") as f:
-            for line in f:
-                data = json.loads(line)
-                if self.player_id == data["player_id"]:
-                    print("okay")
+    def update_player(self, info, choice):
+        """
+        Update user info in database: here is json file
+        @param info has user input that need to be update
+        @param choice will have info in integer(rank) or string for the rest
+        """
+        data = TinyDB("database/players.json")
+        if choice == "rank":
+            data.update({choice: int(info)}, where("player_id") == self.player_id)
+        else:
+            data.update({choice: info}, where("player_id") == self.player_id)
 
+    def load_players_data(self):
+        """get list of players"""
+        data = TinyDB("database/players.json")
+        data.all()
+        players = []
+        for player in data:
+            players.append(player)
 
-# player = Player("AB12345", "thao", "mai", "24/22/1990", 1)
-# player.save_player()
-# player2 = Player("AB12346", "thao", "mai", "24/22/1990", 1)
-# player2.save_player()
-# player.update_player()
+        return players

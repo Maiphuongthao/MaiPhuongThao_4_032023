@@ -10,26 +10,21 @@ class Match:
     """
 
     def __init__(
-        self, 
-        player_1, 
-        player_2, 
-        score_1: float=0.0, 
-        score_2: float=0.0, 
-        name: str
-        ):
+        self,
+        player_1,
+        player_2,
+        score_1: float = 0.0,
+        score_2: float = 0.0,
+    ):
         self.player_1 = player_1
         self.player_2 = player_2
         self.score_1 = score_1
         self.score_2 = score_2
-        self.winner = None
-        self.name = name
-    
-    def create_pairs(self):
+
+    def set_pairs(self):
         """set tuple of match"""
-        return (
-            [self.player_1, self.score_1],[self.player_2, self.score_2]
-        )
-    
+        return ([self.player_1, self.score_1], [self.player_2, self.score_2])
+
     def set_player_color(self):
         if random.choice([True, False]):
             self.color_player1 = "Blanc"
@@ -44,7 +39,5 @@ class Match:
             "player_2": self.player_2.get_serialized_player(),
             "score_1": self.score_1,
             "score_2": self.score_2,
-            "winner":self.winner,
-            "name": self.name
         }
         return serialized_match
