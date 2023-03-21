@@ -1,5 +1,6 @@
 import datetime
-import json
+from tinydb import TinyDB, where
+from pathlib import Path
 from round import Round
 from player import Player
 
@@ -36,6 +37,14 @@ class Tournament:
     def __str__(self) -> str:
         pass
 
+    def sort_players_by_rank(self):
+        """ "Sort players by theirs rank ascending position"""
+        self.players = sorted(self.players, key=lambda x: x.get("rank"))
+
+    def sort_palyer_by_score(self):
+        """sort players by their score descending position"""
+        self.players = sorted(self.players, key=lambda x: x.get("score"), reverse=True)
+
     def get_serialized_tournaments(self):
         serialized_tournaments = {
             "name": self.name,
@@ -48,4 +57,40 @@ class Tournament:
             "description": self.description,
             "number_of_rounds": self.number_of_rounds,
         }
-        return json.dumps(serialized_tournaments)
+        return serialized_tournaments
+
+    def save_tournament_data(self):
+        """Save tournament data into json file"""
+        file_name = "tournaments.json"
+        file_path = Path("database")
+
+        if not Path(file_path).exists():
+            Path.mkdir(file_path)
+
+        path = file_path.joinpath(file_name)
+        data = TinyDB(path)
+        data.insert(self.get_serialized_tournaments())
+
+    def update_tournament(self):
+        """update tournament after each round"""
+        data = TinyDB("database/tournaments.json")
+        data.update({"rounds": self.rounds}, where("name") == self.name)
+        data.update({"players": self.players}, where("name" == self.name))
+        data.update({"current_round": self.current_round}, where("name" == self.name))
+
+    def update_time(self, time, info):
+        """
+        update start and end time of tournament
+        """
+        data = TinyDB("database/tournaments.json")
+        data.update({info: time}, where("name" == self.name))
+
+    def load_tournament(self):
+        """
+        Load tournament data ti return the list"""
+        data = TinyDB("database/tournaments.json")
+        data.all()
+        tournaments_list = []
+        for tournament in data:
+            tournaments_list.append(tournament)
+        return tournaments_list

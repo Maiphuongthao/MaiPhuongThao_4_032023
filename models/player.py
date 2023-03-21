@@ -1,4 +1,5 @@
-import json
+from tinydb import TinyDB, where
+from pathlib import Path
 
 
 class Player:
@@ -14,7 +15,7 @@ class Player:
         first_name: str,
         last_name: str,
         birthday: str,
-        rank: int,
+        rank: int = 0,
     ):
         self.player_id = player_id
         self.first_name = first_name
@@ -29,13 +30,38 @@ class Player:
 
     def get_serialized_player(self):
         serialized_player = {
+            "player_id": self.player_id,
             "firstname": self.first_name,
             "lastname": self.last_name,
             "birthday": self.birth_day,
             "rank": self.rank,
             "scores": self.scores,
         }
-        return json.dumps(serialized_player)
+        return serialized_player
 
+    def save_player_data(self):
+        """
+        save user data to json file
+        """
+        file_name = "players.json"
+        file_path = Path("database")
 
-# player = Player("AB12345", "thao", "mai", "24/22/1990",1)
+        if not Path(file_path).exists():
+            Path.mkdir(file_path)
+
+        path = file_path.joinpath(file_name)
+        data = TinyDB(path)
+        data.insert(self.get_serialized_player())
+
+    def update_player(self, info, choice):
+        """
+        Update user info in database: here is json file
+        @param info has user input that need to be update
+        @param choice will have info in integer(rank) or string for the rest
+        """
+        data = TinyDB("database/players.json")
+        if choice == "rank":
+            data.update({choice: int(info)}, where("player_id") == self.player_id)
+        else:
+            data.update({choice: info}, where("player_id") == self.player_id)
+
