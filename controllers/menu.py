@@ -1,12 +1,13 @@
 from views.menu import Menu
 from models.player import Player
+from models import database
 
 
 class MenuManager:
     def __init__(self):
         self.view_menu = Menu()
 
-    def exit_option(self):
+    def return_option(self):
         self.view_menu.exit_msg()
         user_input = input().lower()
         match user_input:
@@ -16,32 +17,41 @@ class MenuManager:
                 self.start_main_menu()
             case _:
                 self.view_menu.error_msg()
-                self.exit_option()
+                self.return_option()
 
     def start_main_menu(self):
         """
         Selections of main menu
         """
+        self.view_menu.title()
 
         choices = {
-            "1": {"text": "Créer un tournois", "controller": self.create_tournament()},
+            "1": {"text": "Créer un tournois", "controller": self.create_tournament},
             "2": {
                 "text": "Charger un tournois",
                 "controller": self.resume_tournament(),
             },
-            "3": {"text": "Créer des jouers", "controller": self.create_player()},
-            "4": {"text": "Rapports", "controller": self.reports_menu()},
-            "5": {"text": "Quitter", "controller": self.exit_option()},
+            "3": {
+                "text": "Créer des jouers",
+                "controller": self.create_player,
+            },
+            "4": {
+                "text": "Modifier un jouer",
+                "controller": self.update_player_info,
+            },
+            "5": {"text": "Rapports", "controller": self.reports_menu},
+            "q": {"text": "Quitter", "controller": self.exit},
         }
 
         self.view_menu.main_menu(choices)
         self.view_menu.input_prompt()
-        user_input = input()
+        user_input = input().lower()
+
         try:
-            choices[user_input].controller()
+            choices[user_input]["controller"]()
         except KeyError:
-            self.view_menu.error_msg()
-            self.start_main_menu()
+            self.view_menu.error_msg
+            self.start_main_menu
 
     def create_tournament(self):
         pass
@@ -52,22 +62,8 @@ class MenuManager:
     def resume_tournament(self):
         pass
 
-    """def create_tournament(self):
-       
-        #Create a new tournament, serialized it and import to db
-     
-        self.view_menu.tournament_title()
-        tournament_info = []
-        options = ["name", "location", "description"]
-        for op in options:
-            self.view_menu.input_prompt_text()
-            user_input = input()
-            if user_input == "5":
-                self.start_main_menu()
-            else:
-                tournament_info.append(user_input)
-        
-    """
+    def exit(self):
+        pass
 
     def create_player(self):
         self.view_menu.create_player_title()
@@ -76,10 +72,14 @@ class MenuManager:
         for i in info_values:
             self.view_menu.input_prompt_text(i)
             user_input = input()
-            if user_input == "5":
+            if user_input == "q":
                 self.start_main_menu()
             else:
                 player_infos.append(user_input)
+
+        if player_infos[4] == "":
+            player_infos[4] = "0"
+
         self.view_menu.review_player(player_infos)
         user_input = input().lower()
         match user_input:
@@ -98,24 +98,25 @@ class MenuManager:
                 self.start_main_menu()
             case _:
                 self.view_menu.error_msg()
-                self.exit_option()
+                self.start_main_menu()
 
     def update_player_info(self):
         """
         update existing player's infos
         load player data and get selected player
-        chose the option that need to be changed
+        chose the option that need to be changed then save it to new
         """
-        players = Player.load_players_data()
+        players = database.load_players_data()
         self.view_menu.select_a_player(players)
         self.view_menu.input_prompt()
         user_input = input()
-        if user_input == "5":
+        if user_input == "q":
             self.start_main_menu()
+        # breakpoint()
 
-        p = players(int(user_input - 1))
+        p = players[int(user_input) - 1]
         p = Player(
-            p["player_id"], p["first_name"], p["last_name"], p["birthday"], p["rank"]
+            p["player_id"], p["firstname"], p["lastname"], p["birthday"], p["rank"]
         )
 
         input_values = ["prénom", "nom", "date de naissance", "rang"]
@@ -123,20 +124,25 @@ class MenuManager:
         self.view_menu.input_prompt()
         user_input = input()
 
-        if user_input == "5":
+        if user_input == "q":
             self.start_main_menu()
 
         elif int(user_input) <= len(input_values):
             update_info = input_values[int(user_input) - 1]
-            key = ["first_name", " last_name", " birthday", "rank"]
+
+            key = ["firstname", " lastname", " birthday", "rank"]
+            updated_info = key[int(user_input) - 1]
 
             self.view_menu.input_prompt_text(f"nouveau {update_info}")
             user_input = input()
 
-            if user_input == "5":
+            if user_input == "q":
                 self.start_main_menu()
             else:
-                updated_info = key[int(user_input) - 1]
+                # updated_info = key[int(user_input) - 1]
                 p.update_player(user_input, updated_info)
                 self.view_menu.player_saved()
                 self.update_player_info()
+        else:
+            self.view_menu.error_msg()
+            self.update_player_info()

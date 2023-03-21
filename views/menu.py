@@ -10,7 +10,7 @@ class Menu:
 
     def main_menu(self, choices):
         for choice in choices:
-            print(choice, choices[choice].text)
+            print(choice, choices[choice]["text"])
 
     def input_prompt(self):
         print("\nSelectionnez votre choix: ")
@@ -30,35 +30,36 @@ class Menu:
 
     def player_saved(self):
         print("\nJouer est bien enregistré")
-
+    
     def select_a_player(self, players):
         """
         Display the player
         """
         print("\nChoisir le jouer:")
-        for player in range(len(players)):
-            print(f"[{players[player]['id']}]", end=" - ")
+        # breakpoint()
+        for i, player in enumerate(players):
+            print(f"{i + 1} : [{players[i]['player_id']}]", end=" - ")
             print(
-                f"{players[player]['first_name']}, {players[i]['last_name']}", end="\n"
+                f"{players[i]['firstname']} {players[i]['lastname']}", end=" | "
             )
-            print(f"Rang : {players[player]['rank']}")
-        print("\nTapez 5 pour retourner au menu principal")
+            print(f"Rang : {players[i]['rank']}")
+        print("\nEntrez q pour retourner au menu principal")
 
-    def update_player_info(player, info):
+    def update_player_info(self, player, info):
         """
         display player info that is changed
         """
         print("\nModifier l'information de jouer\n")
         print(f"Jouer modifié: {player.first_name} {player.last_name}", end="\n")
         for i in range(len(info)):
-            print(f"{i+1} modifié {info[i]}")
-        print("\nTapez 5 pour retournez au menu principal.")
+            print(f"{i+1}: modifié {info[i]}")
+        print("\nTapez q pour retournez au menu principal.")
 
     def exit_msg(self):
         print("\nEtês vous sûr de vouloir quitter ce programme? oui/non")
 
     def error_msg(self):
-        print("\nVeuillez entrez un choix valide: ")
+        print("\nVotre choix n'est pas valide. le sytème retourner au menu principal ")
 
     def input_prompt_text(self, option):
-        print(f"\nEntrez {option} (tapez 5 pour retourner au menu principal) : ")
+        print(f"\nEntrez {option} (tapez q pour retourner au menu principal) : ")

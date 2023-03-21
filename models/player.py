@@ -15,7 +15,7 @@ class Player:
         first_name: str,
         last_name: str,
         birthday: str,
-        rank: int,
+        rank: int = 0,
     ):
         self.player_id = player_id
         self.first_name = first_name
@@ -65,12 +65,3 @@ class Player:
         else:
             data.update({choice: info}, where("player_id") == self.player_id)
 
-    def load_players_data(self):
-        """get list of players"""
-        data = TinyDB("database/players.json")
-        data.all()
-        players = []
-        for player in data:
-            players.append(player)
-
-        return players
