@@ -54,7 +54,8 @@ class MenuManager:
             self.start_main_menu
 
     def create_tournament(self):
-        pass
+        """create a tournament and save it"""
+        
 
     def reports_menu(self):
         pass
@@ -146,3 +147,5 @@ class MenuManager:
         else:
             self.view_menu.error_msg()
             self.update_player_info()
+
+    
