@@ -1,6 +1,8 @@
 from views.menu import Menu
 from models.player import Player
+from models.tournament import Tournament
 from models import database
+import datetime
 
 
 class MenuManager:
@@ -55,7 +57,41 @@ class MenuManager:
 
     def create_tournament(self):
         """create a tournament and save it"""
-        
+        self.view_menu.tournament_title()
+        tournament_info = []
+        infos = ["name", "location", "description", "date de debut"]
+        for info in infos:
+            self.view_menu.input_prompt_text(info)
+            user_input = input()
+            if user_input == "q":
+                self.start_main_menu()
+            else:
+                if user_input[3] == "":
+                    user_input[3] = Tournament.set_start_date()
+                tournament_info.append(user_input)
+
+        tours_players = self.select_players(8)
+        self.view_menu.review_tournament(tournament_info, tours_players)
+
+    def select_players(self, total_chosed_players):
+        """
+        Select playrs for tournament, 4 tours corresponds with 8 players by max default
+        """
+        players = database.load_players_data()
+        list_players_id = []
+        for i in range(len(players)):
+            list_players_id.append(players[i]["player_id"])
+
+        tour_players = []
+        i= 0
+        while i < total_chosed_players:
+            self.view_menu.select_a_player(players, i+1)
+            self.view_menu.input_prompt()
+            user_input = input()
+            if user_input == "q":
+                self.start_main_menu()
+            elif 
+
 
     def reports_menu(self):
         pass
@@ -108,7 +144,7 @@ class MenuManager:
         chose the option that need to be changed then save it to new
         """
         players = database.load_players_data()
-        self.view_menu.select_a_player(players)
+        self.view_menu.select_a_player(players, "pour modifier")
         self.view_menu.input_prompt()
         user_input = input()
         if user_input == "q":
@@ -147,5 +183,3 @@ class MenuManager:
         else:
             self.view_menu.error_msg()
             self.update_player_info()
-
-    

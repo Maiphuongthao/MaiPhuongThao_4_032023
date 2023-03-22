@@ -37,11 +37,14 @@ class Tournament:
     def __str__(self) -> str:
         pass
 
+    def set_start_date(self):
+        self.start_date = datetime.datetime.now
+
     def sort_players_by_rank(self):
         """ "Sort players by theirs rank ascending position"""
         self.players = sorted(self.players, key=lambda x: x.get("rank"))
 
-    def sort_palyer_by_score(self):
+    def sort_player_by_score(self):
         """sort players by their score descending position"""
         self.players = sorted(self.players, key=lambda x: x.get("score"), reverse=True)
 

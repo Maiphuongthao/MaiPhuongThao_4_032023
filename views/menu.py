@@ -18,6 +18,9 @@ class Menu:
     def tournament_title(self):
         print("\n\n\nNOUVEAU TOURNAMENT")
 
+    def review_tournament(self, info, players):
+        tournament = f"Nouveau tournament:\n{info[0]}"
+
     def create_player_title(self):
         print("\n\n\nNOUVEAU JOUER")
 
@@ -30,18 +33,16 @@ class Menu:
 
     def player_saved(self):
         print("\nJouer est bien enregistré")
-    
-    def select_a_player(self, players):
+
+    def select_a_player(self, players, number_player):
         """
         Display the player
         """
-        print("\nChoisir le jouer:")
+        print(f"\nChoisir le jouer: {number_player}")
         # breakpoint()
         for i, player in enumerate(players):
             print(f"{i + 1} : [{players[i]['player_id']}]", end=" - ")
-            print(
-                f"{players[i]['firstname']} {players[i]['lastname']}", end=" | "
-            )
+            print(f"{players[i]['firstname']} {players[i]['lastname']}", end=" | ")
             print(f"Rang : {players[i]['rank']}")
         print("\nEntrez q pour retourner au menu principal")
 
