@@ -19,10 +19,35 @@ class Menu:
         print("\n\n\nNOUVEAU TOURNAMENT")
 
     def review_tournament(self, info, players):
-        tournament = f"Nouveau tournament:\n{info[0]}"
+        print(
+            f"Nouveau tournament: {info[0].upper()}, à {info[1]}\nDescription: {info[2]}\nCommence le: {info[3]}\nTour: {info[4]}\nJouers:\n"
+        )
+        for p in players:
+            players_details = f"Player{players.index(p) + 1}:{p['player_id']} | {p['firstname']} {p['lastname']} | {p['birthday']} | Rang: {p['rank']}"
+            print(players_details)
+        print("\nEnregistrer ces informations? (oui/ non)")
+
+    def player_selected_error(self):
+        print(
+            "Ce jouer est selectionné ou n'existe pas, veuillez choisir un autre jouer ou créer un nouveau",
+            end="\n",
+        )
+        print("1: Choisir un autre jouer", end="\n")
+        print("2: Créer un nouveau jouer")
+
+    def tournament_saved(self):
+        print("Le tournois est créé")
+
+    def start_tournament_question(self):
+        print("Commencez le tournois maintenant? (oui/ non)")
 
     def create_player_title(self):
         print("\n\n\nNOUVEAU JOUER")
+
+    def total_players_prompt(self, players_total, players_needed):
+        print(
+            f"il y a que {players_total} jouer(s) dans la list. Veuillez ajouter {players_needed - players_total} jouers."
+        )
 
     def review_player(self, info):
         print("\nNouveau jouer est créé\n")
@@ -40,10 +65,10 @@ class Menu:
         """
         print(f"\nChoisir le jouer: {number_player}")
         # breakpoint()
-        for i, player in enumerate(players):
-            print(f"{i + 1} : [{players[i]['player_id']}]", end=" - ")
-            print(f"{players[i]['firstname']} {players[i]['lastname']}", end=" | ")
-            print(f"Rang : {players[i]['rank']}")
+        for p in range(len(players)):
+            print(f"{players[p]['id']} : [{players[p]['player_id']}]", end=" - ")
+            print(f"{players[p]['firstname']} {players[p]['lastname']}", end=" | ")
+            print(f"Rang : {players[p]['rank']}")
         print("\nEntrez q pour retourner au menu principal")
 
     def update_player_info(self, player, info):

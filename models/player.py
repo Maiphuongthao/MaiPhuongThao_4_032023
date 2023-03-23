@@ -41,7 +41,7 @@ class Player:
 
     def save_player_data(self):
         """
-        save user data to json file
+        save user data to json file, set id json as id of player
         """
         file_name = "players.json"
         file_path = Path("database")
@@ -51,7 +51,8 @@ class Player:
 
         path = file_path.joinpath(file_name)
         data = TinyDB(path)
-        data.insert(self.get_serialized_player())
+        id = data.insert(self.get_serialized_player())
+        data.update({"id": id}, doc_ids=[id])
 
     def update_player(self, info, choice):
         """
@@ -64,4 +65,3 @@ class Player:
             data.update({choice: int(info)}, where("player_id") == self.player_id)
         else:
             data.update({choice: info}, where("player_id") == self.player_id)
-

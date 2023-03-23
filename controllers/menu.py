@@ -1,13 +1,14 @@
 from views.menu import Menu
 from models.player import Player
 from models.tournament import Tournament
-from models import database
-import datetime
+from models import utils
+from controllers.tournaments import TournamentManager
 
 
 class MenuManager:
     def __init__(self):
         self.view_menu = Menu()
+        self.tournament_controller = TournamentManager()
 
     def return_option(self):
         self.view_menu.exit_msg()
@@ -59,39 +60,100 @@ class MenuManager:
         """create a tournament and save it"""
         self.view_menu.tournament_title()
         tournament_info = []
-        infos = ["name", "location", "description", "date de debut"]
+        infos = [
+            "name",
+            "location",
+            "description",
+            "date de debut",
+            "nombre des jouers (min 8)",
+            "nombre de tour (min 4)",
+        ]
         for info in infos:
             self.view_menu.input_prompt_text(info)
             user_input = input()
             if user_input == "q":
                 self.start_main_menu()
             else:
-                if user_input[3] == "":
-                    user_input[3] = Tournament.set_start_date()
                 tournament_info.append(user_input)
 
-        tours_players = self.select_players(8)
-        self.view_menu.review_tournament(tournament_info, tours_players)
+        if tournament_info[3] == "":
+            tournament_info[3] = utils.set_start_date()
+        if tournament_info[4] == "":
+            tournament_info[4] = int(8)
+        if tournament_info[5] == "":
+            tournament_info[5] = int(4)
+
+        tour_players = self.select_players(tournament_info[4])
+        self.view_menu.review_tournament(tournament_info, tour_players)
+        user_input = input().lower()
+        if user_input == "non":
+            self.start_main_menu()
+        elif user_input == "oui":
+            tournament = Tournament(
+                name=tournament_info[0],
+                location=tournament_info[1],
+                start_date=tournament_info[3],
+                end_date="TBD",
+                rounds=[],
+                players=tour_players,
+                current_round=1,
+                description=tournament_info[2],
+                number_of_rounds=tournament_info[5],
+            )
+            tournament.save_tournament_data()
+            self.view_menu.tournament_saved()
+            self.view_menu.start_tournament_question()
+            user_input = input()
+            if user_input == "oui":
+                self.tournament_controller.start_tournament(tournament)
+            elif user_input == "non":
+                self.start_main_menu()
+            else:
+                self.view_menu.error_msg()
+        else:
+            self.view_menu.error_msg()
 
     def select_players(self, total_chosed_players):
         """
         Select playrs for tournament, 4 tours corresponds with 8 players by max default
         """
-        players = database.load_players_data()
-        list_players_id = []
-        for i in range(len(players)):
-            list_players_id.append(players[i]["player_id"])
+        players = utils.load_players_data()
+        list_ids = utils.get_player_ids()
 
+        len_list = len(list_ids)
         tour_players = []
-        i= 0
+
+        while total_chosed_players > len_list:
+            self.view_menu.total_players_prompt(len_list, total_chosed_players)
+            self.create_player()
+            len_list
+
+        i = 0
         while i < total_chosed_players:
-            self.view_menu.select_a_player(players, i+1)
+            self.view_menu.select_a_player(players, i + 1)
             self.view_menu.input_prompt()
-            user_input = input()
+            user_input = int(input())
             if user_input == "q":
                 self.start_main_menu()
-            elif 
 
+            elif user_input in list_ids:
+                index = list_ids.index(user_input)
+                tour_players.append(players[index])
+                list_ids.remove(list_ids[index])
+                players.remove(players[index])
+                i += 1
+            else:
+                self.view_menu.player_selected_error()
+                selection = input()
+                if selection == "1":
+                    self.select_players(total_chosed_players)
+                if selection == "2":
+                    self.create_player()
+                else:
+                    self.view_menu.error_msg()
+                    self.create_tournament()
+
+        return tour_players
 
     def reports_menu(self):
         pass
@@ -130,7 +192,7 @@ class MenuManager:
                 )
                 player.save_player_data()
                 self.view_menu.player_saved()
-                self.start_main_menu()
+
             case "non":
                 self.start_main_menu()
             case _:
@@ -143,7 +205,7 @@ class MenuManager:
         load player data and get selected player
         chose the option that need to be changed then save it to new
         """
-        players = database.load_players_data()
+        players = utils.load_players_data()
         self.view_menu.select_a_player(players, "pour modifier")
         self.view_menu.input_prompt()
         user_input = input()

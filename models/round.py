@@ -1,6 +1,5 @@
 import datetime
-import json
-from match import Match
+from models.match import Match
 
 
 class Round:
