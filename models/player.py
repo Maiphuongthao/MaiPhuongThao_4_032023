@@ -1,5 +1,4 @@
 from tinydb import TinyDB, where
-from pathlib import Path
 
 
 class Player:
@@ -23,36 +22,20 @@ class Player:
         self.birth_day = birthday
         self.rank = rank
         self.scores = 0.0
-        self.play_with = []
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
     def get_serialized_player(self):
         serialized_player = {
-            "player_id": self.player_id,
-            "firstname": self.first_name,
-            "lastname": self.last_name,
-            "birthday": self.birth_day,
-            "rank": self.rank,
-            "scores": self.scores,
+            "Joueur_id": self.player_id,
+            "Nom": self.first_name,
+            "Prénom": self.last_name,
+            "Date de naissance": self.birth_day,
+            "Classement": self.rank,
+            "Score": self.scores,
         }
         return serialized_player
-
-    def save_player_data(self):
-        """
-        save user data to json file, set id json as id of player
-        """
-        file_name = "players.json"
-        file_path = Path("database")
-
-        if not Path(file_path).exists():
-            Path.mkdir(file_path)
-
-        path = file_path.joinpath(file_name)
-        data = TinyDB(path)
-        id = data.insert(self.get_serialized_player())
-        data.update({"id": id}, doc_ids=[id])
 
     def update_player(self, info, choice):
         """
@@ -61,7 +44,7 @@ class Player:
         @param choice will have info in integer(rank) or string for the rest
         """
         data = TinyDB("database/players.json")
-        if choice == "rank":
-            data.update({choice: int(info)}, where("player_id") == self.player_id)
+        if choice == "Classement":
+            data.update({choice: int(info)}, where("Joueur_id") == self.player_id)
         else:
-            data.update({choice: info}, where("player_id") == self.player_id)
+            data.update({choice: info}, where("Joueur_id") == self.player_id)

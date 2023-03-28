@@ -1,8 +1,6 @@
-import datetime
 from tinydb import TinyDB, where
 from pathlib import Path
-from models.round import Round
-from models.player import Player
+import datetime
 
 
 class Tournament:
@@ -18,8 +16,8 @@ class Tournament:
         location: str,
         start_date: datetime,
         end_date: datetime,
-        rounds: list[Round],
-        players: list[Player],
+        rounds: list,
+        players: list,
         current_round: int,
         description: str,
         number_of_rounds: int = 4,
@@ -38,21 +36,29 @@ class Tournament:
         """ "Sort players by theirs rank ascending position"""
         self.players = sorted(self.players, key=lambda x: x.get("rank"))
 
-    def sort_player_by_score(self):
+    def sort_players_by_score(self):
         """sort players by their score descending position"""
-        self.players = sorted(self.players, key=lambda x: x.get("score"), reverse=True)
+        self.players = sorted(self.players, key=lambda x: x.get("scores"), reverse=True)
+
+    def merge_players(self, top_players, bottom_players):
+        merged_players = []
+        for i in range(len(self.players) // 2):
+            merged_players.append(top_players[i])
+            merged_players.append(bottom_players[i])
+
+        self.players = merged_players
 
     def get_serialized_tournaments(self):
         serialized_tournaments = {
-            "name": self.name,
-            "location": self.location,
-            "start_date": self.start_date,
-            "end_date": self.end_date,
-            "rounds": [self.rounds],
-            "players": [self.players],
-            "current_round": self.current_round,
-            "description": self.description,
-            "number_of_rounds": self.number_of_rounds,
+            "Nom": self.name,
+            "Lieu": self.location,
+            "Date de début": self.start_date,
+            "Date de fin": self.end_date,
+            "List des tours": self.rounds,
+            "List des joueurs": self.players,
+            "Tour actuel": self.current_round,
+            "Description": self.description,
+            "Nombre de tours": self.number_of_rounds,
         }
         return serialized_tournaments
 
@@ -71,23 +77,14 @@ class Tournament:
     def update_tournament(self):
         """update tournament after each round"""
         data = TinyDB("database/tournaments.json")
-        data.update({"rounds": self.rounds}, where("name") == self.name)
-        data.update({"players": self.players}, where("name" == self.name))
-        data.update({"current_round": self.current_round}, where("name" == self.name))
+        data.update({"List de tours": self.rounds}, where("Nom") == self.name)
+        data.update({"List des joueurs": self.players}, where("Nom") == self.name)
+        data.update({"Date de fin": self.end_date}, where("Nom") == self.name)
+        data.update({"Tour actuel": self.current_round}, where("Nom") == self.name)
 
     def update_time(self, time, info):
         """
         update start and end time of tournament
         """
         data = TinyDB("database/tournaments.json")
-        data.update({info: time}, where("name" == self.name))
-
-    def load_tournament(self):
-        """
-        Load tournament data ti return the list"""
-        data = TinyDB("database/tournaments.json")
-        data.all()
-        tournaments_list = []
-        for tournament in data:
-            tournaments_list.append(tournament)
-        return tournaments_list
+        data.update({info: time}, where("Nom" == self.name))
