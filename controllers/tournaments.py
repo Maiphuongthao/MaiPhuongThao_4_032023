@@ -80,9 +80,9 @@ class TournamentManager:
                 top_players[i]["Score"],
                 bottom_players[i]["Score"],
             )
-            self.MATCHS_PLAYED.append({top_players[i], bottom_players[i]})
             pairs = m.set_pairs()
             matches.append(pairs)
+            self.MATCHS_PLAYED.append({m.player_1, m.player_2})
 
         return matches
 
