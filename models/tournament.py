@@ -32,14 +32,6 @@ class Tournament:
         self.description = description
         self.number_of_rounds = number_of_rounds
 
-    def sort_players_by_rank(self):
-        """ "Sort players by theirs rank ascending position"""
-        self.players = sorted(self.players, key=lambda x: x.get("rank"))
-
-    def sort_players_by_score(self):
-        """sort players by their score descending position"""
-        self.players = sorted(self.players, key=lambda x: x.get("scores"), reverse=True)
-
     def merge_players(self, top_players, bottom_players):
         merged_players = []
         for i in range(len(self.players) // 2):
@@ -77,7 +69,7 @@ class Tournament:
     def update_tournament(self):
         """update tournament after each round"""
         data = TinyDB("database/tournaments.json")
-        data.update({"List de tours": self.rounds}, where("Nom") == self.name)
+        data.update({"List des tours": self.rounds}, where("Nom") == self.name)
         data.update({"List des joueurs": self.players}, where("Nom") == self.name)
         data.update({"Date de fin": self.end_date}, where("Nom") == self.name)
         data.update({"Tour actuel": self.current_round}, where("Nom") == self.name)

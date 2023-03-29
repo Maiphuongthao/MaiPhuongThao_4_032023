@@ -3,13 +3,11 @@ from views.round import RoundView
 from models.round import Round
 from models.match import Match
 from models.player import Player
-from models.utils import set_date_time
-from operator import attrgetter
+from models.utils import set_date_time, save_data_db
+from operator import itemgetter
 
 
 class TournamentManager:
-    MATCHS_PLAYED = []
-
     def __init__(self):
         self.view_menu = Menu()
         self.round_view = RoundView()
@@ -24,22 +22,14 @@ class TournamentManager:
             while tournament.current_round <= tournament.number_of_rounds:
                 self.next_round(tournament)
                 tournament.current_round += 1
+                tournament.update_tournament()
             tournament.end_date = set_date_time()
-            tournament.update_tournament("Date de début", tournament.end_date)
             self.tournament_end(tournament)
         elif tournament.current_round > tournament.number_of_rounds:
             self.tournament_end(tournament)
         # message erreur here
 
-    def first_round(self, tournament):
-        matches = self.initialize_starting_pairs(tournament)
-        round = Round(
-            "Tour 1",
-            set_date_time(),
-            "TBD",
-            matches,
-        )
-
+    def play_tour(self, tournament, round):
         self.round_view.round_title(tournament, round.start_date)
         self.round_view.display_matches(round.matches)
         self.round_view.finish_round()
@@ -59,13 +49,24 @@ class TournamentManager:
                 self.view_menu.error_msg()
                 self.view_menu.main_menu()
 
-    def next_round(self, tournament):
+    def first_round(self, tournament):
+        matches = self.initialize_starting_pairs(tournament)
         round = Round(
-            ("Tour " + str(tournament.current_round)),
+            "Tour 1",
             set_date_time(),
             "TBD",
+            matches,
         )
-        pass
+
+        self.play_tour(tournament, round)
+
+    def next_round(self, tournament):
+        matches = self.initialize_pairs(tournament)
+        round = Round(
+            ("Tour " + str(tournament.current_round)), set_date_time(), "TBD", matches
+        )
+
+        self.play_tour(tournament, round)
 
     def initialize_starting_pairs(self, tournament):
         number_of_pairs = len(tournament.players) // 2
@@ -73,6 +74,7 @@ class TournamentManager:
         top_players = tournament.players[number_of_pairs:]
         bottom_players = tournament.players[:number_of_pairs]
         matches = []
+
         for i in range(number_of_pairs):
             m = Match(
                 top_players[i],
@@ -82,56 +84,70 @@ class TournamentManager:
             )
             pairs = m.set_pairs()
             matches.append(pairs)
-            self.MATCHS_PLAYED.append({m.player_1, m.player_2})
-
         return matches
 
     def initialize_pairs(self, tournament):
-        sorted_players_by_score = []
-        sorted_player_flat = []
+        sorted_players = []
+        flatten_players = self.get_flatten_players(tournament)
         match_to_try = set()
+        matches_played = self.get_matches_played(tournament)
 
-        for round in tournament.rounds:
-            for player in round.matches:
-                sorted_players_by_score.append(player)
-
-        for player in sorted_players_by_score:
-            player.pop()
-            sorted_player_flat.append(player[0])
-
-        sorted_player_flat.sort(key=attrgetter("Score", "Classement"), reverse=True)
-        sorted_players_by_score.clear()
-
-        for player_1 in sorted_player_flat:
-            if player_1 in sorted_players_by_score:
+        flatten_players.sort(key=itemgetter("Score", "Classement"), reverse=True)
+        for player_1 in flatten_players:
+            if player_1 in sorted_players:
                 continue
             else:
                 try:
-                    player_2 = sorted_player_flat[
-                        sorted_player_flat.index(player_1) + 1
-                    ]
+                    player_2 = flatten_players[flatten_players.index(player_1) + 1]
                 except IndexError:
                     break
-            match_to_try.add(player_1)
-            match_to_try.add(player_2)
-
-            while match_to_try in self.MATCHS_PLAYED:
-                match_to_try.remove(player_2)
+            unserilized_player_1 = self.unserialized_player(player_1)
+            unserialized_player_2 = self.unserialized_player(player_2)
+            match_to_try.add(unserilized_player_1)
+            match_to_try.add(unserialized_player_2)
+            while match_to_try in matches_played:
+                match_to_try.remove(unserialized_player_2)
                 try:
-                    player_2 = sorted_player_flat[
-                        sorted_player_flat.index(player_2) + 1
-                    ]
+                    player_2 = flatten_players[flatten_players.index(player_2) + 1]
+                    match_to_try.add(unserialized_player_2)
                 except IndexError:
                     break
-                match_to_try.add(player_2)
-                continue
+               
             else:
-                sorted_players_by_score.append(player_1)
-                sorted_players_by_score.append(player_2)
-                sorted_player_flat.pop(sorted_player_flat.index(player_2) + 1)
-                self.MATCHS_PLAYED.append({player_1, player_2})
+                new_match = [
+                    (player_1, player_1["Score"]),
+                    (player_2, player_2["Score"]),
+                ]
+                sorted_players.append(new_match)
                 match_to_try.clear()
-        return sorted_players_by_score
+        return sorted_players
+
+    def get_matches_played(self, tournament):
+        matches_played = []
+        for round in tournament.rounds:
+            for match in round["List des matchs"]:
+                player_1 = self.unserialized_player(match[0][0])
+                player_2 = self.unserialized_player(match[1][0])
+                matches_played.append({player_1, player_2})
+        return matches_played
+
+    def get_flatten_players(self, tournament):
+        flatten_players = []
+        for round in tournament.rounds:
+            for match in round["List des matchs"]:
+                for player in match:
+                    flatten_players.append(player[0])
+        return flatten_players
+
+    def unserialized_player(self, serialized_player):
+        player_id = serialized_player["Joueur_id"]
+        last_name = serialized_player["Nom"]
+        first_name = serialized_player["Prénom"]
+        birth_day = serialized_player["Date de naissance"]
+        rank = serialized_player["Classement"]
+        scores = serialized_player["Score"]
+        id = serialized_player["id"]
+        return (player_id, last_name, first_name, birth_day, rank, scores, id)
 
     def set_round(self, round):
         return round.get_serialized_round()
