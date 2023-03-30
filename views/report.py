@@ -1,5 +1,4 @@
 from prettytable import PrettyTable
-from views.round import RoundView
 
 
 class ReportView:
@@ -10,7 +9,6 @@ class ReportView:
             "Nom",
             "Prénom",
             "Date de naissance",
-            "Rank",
             "Scores",
         ]
         self.tournament_report_field_names = [
@@ -25,11 +23,9 @@ class ReportView:
         self.match_field_names = [
             "Match #",
             "Nom P1",
-            "Classement P1",
             "Score P1",
             " ",
             "Nom P2",
-            "Classement P2",
             "Score P2",
         ]
 
@@ -51,7 +47,6 @@ class ReportView:
                     players[i]["Nom"],
                     players[i]["Prénom"],
                     players[i]["Date de naissance"],
-                    players[i]["Classement"],
                     players[i]["Score"],
                 ]
             )
@@ -103,22 +98,49 @@ class ReportView:
         print("\n---ET---")
         self.display_players(players)
 
-    def display_rounds_matches(self, tournament, rounds, matches):
+    def display_rounds_matches(self, tournament, rounds):
         self.display_one_tournament(tournament)
-        print(f"\n\n---LES TOURS DE {tournament.name.upper()} ")
-        self.display_rounds(round)
-        print(f"---LES MATCHES DE {round.name.upper()}")
-        self.display_matches(matches)
-      
+        print("\n")
+        print(f"\n---LES TOURS DE {tournament.name.upper()} ")
+        self.display_rounds(rounds)
+        print("\n")
+        for i in range(len(rounds)):
+            matches = rounds[i]["List des matchs"]
+            print(f"---LES MATCHES DE {rounds[i]['Nom'].upper()}")
+            self.display_matches(matches)
+            print("\n")
 
     def display_rounds(self, rounds):
         self.table.clear()
         self.table.field_names = ["Nom", "Date de début", "Date de fin"]
         self.table.align = "l"
-        for r in rounds:
-            self.table.add_row([round.name, round.start_date, round.end_date])
-            print(self.table)
+        for round in rounds:
+            self.table.add_row(
+                [round["Nom"], round["Date de début"], round["Date de fin"]]
+            )
+        print(self.table)
 
     def display_matches(self, matches):
-        self.round_view = RoundView()
-        self.round_view.display_matches(matches)
+        self.table.clear()
+        self.table.field_names = self.match_field_names
+        self.table.align = "l"
+        for i in range(len(matches)):
+            name_p1 = f"{matches[i][0][0]['Nom']} {matches[i][0][0]['Prénom']}"
+            name_p2 = f"{matches[i][1][0]['Nom']} {matches[i][1][0]['Prénom']}"
+            score_p1 = f"{matches[i][0][1]}"
+            score_p2 = f"{matches[i][1][1]}"
+            row = [
+                i + 1,
+                name_p1,
+                score_p1,
+                " vs ",
+                name_p2,
+                score_p2,
+            ]
+            self.table.add_row(row)
+        print(self.table)
+
+    def final_menu(self):
+        print("\n Voulez vous retourner au:", end="\n")
+        print("1: Menu des raports")
+        print("2: Menu principal")

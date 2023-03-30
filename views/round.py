@@ -8,11 +8,9 @@ class RoundView:
         self.round_field_names = [
             "Match #",
             "Nom P1",
-            "Classement P1",
             "Score P1",
             " ",
             "Nom P2",
-            "Classement P2",
             "Score P2",
         ]
 
@@ -34,26 +32,21 @@ class RoundView:
         """
         self.table.clear()
         self.table.field_names = self.round_field_names
-
+        self.table.align = "l"
         for i in range(len(matches)):
             name_p1 = f"{matches[i][0][0]['Nom']} {matches[i][0][0]['Prénom']}"
             name_p2 = f"{matches[i][1][0]['Nom']} {matches[i][1][0]['Prénom']}"
-            rank_p1 = f"{matches[i][0][0]['Classement']}"
-            rank_p2 = f"{matches[i][1][0]['Classement']}"
-            score_p1 = f"{matches[i][0][1]}"
-            score_p2 = f"{matches[i][1][1]}"
-            row = []
-            row.insert(0, str(i + 1))
-            row.insert(1, name_p1)
-            row.insert(2, rank_p1)
-            row.insert(3, score_p1)
-            row.insert(4, "vs")
-            row.insert(5, name_p2)
-            row.insert(6, rank_p2)
-            row.insert(7, score_p2)
-
+            score_p1 = 0
+            score_p2 = 0
+            row = [
+                i + 1,
+                name_p1,
+                score_p1,
+                " VS ",
+                name_p2,
+                score_p2,
+            ]
             self.table.add_row(row)
-
         print(self.table)
 
     def finish_round(self):
@@ -69,3 +62,35 @@ class RoundView:
 
     def erreur_scores_option(self):
         print("\nVotre choix est invalide, veuillez choisir le bon bon option")
+
+    def winer_1(self, player_1):
+        print(f"Player {player_1['Nom']} {player_1['Prénom']} a gagné")
+
+    def display_result(self, tournament):
+        self.table.clear()
+        self.table.field_names = self.results_field_names
+        for i in range(len(tournament.players)):
+            self.table.add_row(
+                {
+                    i + 1,
+                    tournament.players[i]["Nom"] + tournament.players[i]["Prénom"],
+                    tournament.players[i]["Score"],
+                    tournament.players[i]["Classement"],
+                }
+            )
+        print("\n---RESULTS---")
+        print(f"{tournament.name.upper()}", end="\n")
+        print(f"Lieu: {tournament.location.title()}", end="/n")
+        print(f"Description: {tournament.description}", end="/n")
+        print(
+            f"Date de début: {tournament.start_date} | Date de fin: {tournament.end_date}",
+            end="/n",
+        )
+        print(self.table)
+
+    def offer_rankin(self):
+        print("Voulez vous modifier les classements? oui/ non:")
+
+    def rank_confirm(self, p):
+        print(f"Modifier classement de joueur: {p.lastname} {p.firstname}")
+        print("Noveau rank (tapez 'q' pour retourner au menu principal):")

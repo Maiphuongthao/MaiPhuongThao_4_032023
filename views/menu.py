@@ -32,3 +32,6 @@ class Menu:
 
     def input_prompt_text(self, option):
         print(f"\nEntrez {option} (tapez q pour retourner au menu principal) : ")
+
+    def not_valide(self):
+        print("\nVotre choix n'est pas valide. Veuillez choisir un bon option: ")

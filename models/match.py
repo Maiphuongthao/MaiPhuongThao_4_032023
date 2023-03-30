@@ -1,5 +1,3 @@
-import random
-
 
 class Match:
     """
@@ -23,12 +21,3 @@ class Match:
     def set_pairs(self):
         """set tuple of match"""
         return ([self.player_1, self.score_1], [self.player_2, self.score_2])
-
-    def get_serialized_match(self):
-        serialized_match = {
-            "Joueur_1": self.player_1,
-            "Score_1": self.score_1,
-            "Joueur_2": self.player_2,
-            "Score_2": self.score_2,
-        }
-        return serialized_match

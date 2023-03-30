@@ -13,8 +13,7 @@ class TournamentView:
         for p in players:
             print(f"Player {players.index(p) + 1} : [{p['Joueur_id']}]", end=" | ")
             print(f"{p['Nom']} {p['Prénom']}", end=" | ")
-            print(f"{p['Date de naissance']}", end=" | ")
-            print(f"Classement: {p['Classement']}")
+            print(f"{p['Date de naissance']}", end="\n")
         print("\nEnregistrer ces informations? (oui/ non)")
 
     def tournament_saved(self):

@@ -14,14 +14,14 @@ class Player:
         last_name: str,
         first_name: str,
         birthday: str,
-        rank: int = 0,
     ):
         self.player_id = player_id
         self.last_name = last_name
         self.first_name = first_name
         self.birth_day = birthday
-        self.rank = rank
+        self.rank = 0
         self.scores = 0.0
+        self.play_with = []
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -34,6 +34,7 @@ class Player:
             "Date de naissance": self.birth_day,
             "Classement": self.rank,
             "Score": self.scores,
+            "play_with": self.play_with,
         }
         return serialized_player
 

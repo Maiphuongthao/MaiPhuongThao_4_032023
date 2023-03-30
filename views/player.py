@@ -12,9 +12,8 @@ class PlayerView:
 
     def review_player(self, info):
         print("\nNouveau jouer est créé\n")
-        print(f"{info[1]}, {info[2]} - {info[0]}", end="\n")
+        print(f"[{info[0]}], {info[1]} {info[2]}", end="\n")
         print(f"Née le: {info[3]}", end="\n")
-        print(f"Rang: {info[4]}", end="\n")
         print("Vous voulez ajouter ce jouer? [oui/ non]", end="\n")
 
     def player_saved(self):
@@ -28,8 +27,7 @@ class PlayerView:
         # breakpoint()
         for p in range(len(players)):
             print(f"{players[p]['id']} : [{players[p]['Joueur_id']}]", end=" - ")
-            print(f"{players[p]['Prénom']} {players[p]['Nom']}", end=" - ")
-            print(f"Classement : {players[p]['Classement']}")
+            print(f"{players[p]['Prénom']} {players[p]['Nom']}", end="\n")
         print("\nEntrez q pour retourner au menu principal")
 
     def update_player_info(self, player, info):
