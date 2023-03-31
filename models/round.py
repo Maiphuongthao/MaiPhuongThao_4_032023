@@ -1,6 +1,4 @@
 import datetime
-import json
-from match import Match
 
 
 class Round:
@@ -16,34 +14,24 @@ class Round:
         self,
         name: str,
         # pair_of_players: str,
-        start_date_time: datetime,
-        end_date_time: datetime,
-        matchs: list[Match],
+        start_date: datetime,
+        end_date: datetime,
+        matches: list,
     ):
         self.name = name
         # self.pair_of_players = (pair_of_players,)
-        self.start_date_time = start_date_time
-        self.end_date_time = end_date_time
-        self.matchs: matchs
+        self.start_date = start_date
+        self.end_date = end_date
+        self.matches = matches
 
     def __str__(self) -> str:
         pass
 
-    def set_round(self):
-        """
-        return round to a list
-        """
-        return [self.name, self.start_date_time, self.end_date_time, self.matchs]
-
-    def get_list_of_matchs(self):
-        self.matchs.append(Match.set_pairs())
-
-    def get_serialized_round(self):
+    def get_serialized_round(self, matches):
         serialized_round = {
-            "name": self.name,
-            # "pair_of_players": self.pair_of_players,
-            "start_date_time": self.start_date_time,
-            "end_date_time": self.end_date_time,
-            "matches": [match.get_serialized_match() for match in self.matchs],
+            "Nom": self.name,
+            "Date de début": self.start_date,
+            "Date de fin": self.end_date,
+            "List des matchs": matches,
         }
         return serialized_round

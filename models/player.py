@@ -1,5 +1,4 @@
 from tinydb import TinyDB, where
-from pathlib import Path
 
 
 class Player:
@@ -12,16 +11,15 @@ class Player:
     def __init__(
         self,
         player_id: str,
-        first_name: str,
         last_name: str,
+        first_name: str,
         birthday: str,
-        rank: int = 0,
     ):
         self.player_id = player_id
-        self.first_name = first_name
         self.last_name = last_name
+        self.first_name = first_name
         self.birth_day = birthday
-        self.rank = rank
+        self.rank = 0
         self.scores = 0.0
         self.play_with = []
 
@@ -30,28 +28,15 @@ class Player:
 
     def get_serialized_player(self):
         serialized_player = {
-            "player_id": self.player_id,
-            "firstname": self.first_name,
-            "lastname": self.last_name,
-            "birthday": self.birth_day,
-            "rank": self.rank,
-            "scores": self.scores,
+            "Joueur_id": self.player_id,
+            "Nom": self.first_name,
+            "Prénom": self.last_name,
+            "Date de naissance": self.birth_day,
+            "Classement": self.rank,
+            "Score": self.scores,
+            "play_with": self.play_with,
         }
         return serialized_player
-
-    def save_player_data(self):
-        """
-        save user data to json file
-        """
-        file_name = "players.json"
-        file_path = Path("database")
-
-        if not Path(file_path).exists():
-            Path.mkdir(file_path)
-
-        path = file_path.joinpath(file_name)
-        data = TinyDB(path)
-        data.insert(self.get_serialized_player())
 
     def update_player(self, info, choice):
         """
@@ -60,8 +45,7 @@ class Player:
         @param choice will have info in integer(rank) or string for the rest
         """
         data = TinyDB("database/players.json")
-        if choice == "rank":
-            data.update({choice: int(info)}, where("player_id") == self.player_id)
+        if choice == "Classement":
+            data.update({choice: int(info)}, where("Joueur_id") == self.player_id)
         else:
-            data.update({choice: info}, where("player_id") == self.player_id)
-
+            data.update({choice: info}, where("Joueur_id") == self.player_id)
