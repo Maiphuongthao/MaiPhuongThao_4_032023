@@ -1,14 +1,18 @@
-from .ascii_chess import chess_tournaments_ascii
-
-
 class Menu:
     def __init__(self) -> None:
         pass
 
     def title(self):
-        print(chess_tournaments_ascii)
+        print("\n\n\n")
+        print("------------------------------------------------".center(20))
+        print("------------------------------------------------".center(20))
+        print("------------------CHESS TOURNAMENT--------------".center(20))
+        print("------------------------------------------------".center(20))
+        print("------------------------------------------------".center(20))
+        print("\n\n\n")
 
     def main_menu(self, choices):
+        print("---MAIN MENU---")
         for choice in choices:
             print(choice, choices[choice]["text"])
 

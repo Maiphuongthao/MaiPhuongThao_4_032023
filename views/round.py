@@ -69,7 +69,11 @@ class RoundView:
     def display_result(self, tournament):
         self.table.clear()
         self.table.field_names = self.results_field_names
-        title = f"RESULTAT de : {tournament.name.upper()} à {tournament.location.title()} {tournament.start_date} - {tournament.end_date}"
+        name = tournament.name.upper()
+        location = tournament.location.title()
+        start_date = tournament.start_date
+        end_date = tournament.end_date
+        title = f"RESULTAT de : {name} à {location} {start_date} - {end_date}"
         self.table.title = title
         for i in range(len(tournament.players)):
             self.table.add_row(

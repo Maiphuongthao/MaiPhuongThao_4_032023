@@ -51,7 +51,6 @@ class MenuManager:
         self.view_menu.main_menu(choices)
         self.view_menu.input_prompt()
         user_input = input().lower()
-
         try:
             choices[user_input]["controller"]()
         except KeyError:
