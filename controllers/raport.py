@@ -53,6 +53,7 @@ class RaportManager:
     def rounds_matches(self, tournaments):
         tournament = self.one_tournament(tournaments)
         rounds = tournament.rounds
+        self.report_view.title_rounds_matchs_report(tournament)
         self.report_view.display_rounds_matches(tournament, rounds)
 
     def return_report_menu(self):

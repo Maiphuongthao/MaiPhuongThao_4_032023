@@ -16,7 +16,7 @@ class RoundView:
 
         self.results_field_names = [
             "Classement du tournois",
-            "Nom",
+            "Nom et Prénom",
             "Score finale",
             "Classement global",
         ]
@@ -33,9 +33,9 @@ class RoundView:
         self.table.clear()
         self.table.field_names = self.round_field_names
         self.table.align = "l"
-        for i in range(len(matches)):
-            name_p1 = f"{matches[i][0][0]['Nom']} {matches[i][0][0]['Prénom']}"
-            name_p2 = f"{matches[i][1][0]['Nom']} {matches[i][1][0]['Prénom']}"
+        for i, match in enumerate(matches):
+            name_p1 = f"{match.player_1['Nom']} {match.player_1['Prénom']}"
+            name_p2 = f"{match.player_2['Nom']} {match.player_2['Prénom']}"
             score_p1 = 0
             score_p2 = 0
             row = [
@@ -69,28 +69,29 @@ class RoundView:
     def display_result(self, tournament):
         self.table.clear()
         self.table.field_names = self.results_field_names
+        title = f"RESULTAT de : {tournament.name.upper()} à {tournament.location.title()} {tournament.start_date} - {tournament.end_date}"
+        self.table.title = title
         for i in range(len(tournament.players)):
             self.table.add_row(
-                {
+                [
                     i + 1,
-                    tournament.players[i]["Nom"] + tournament.players[i]["Prénom"],
+                    tournament.players[i]["Nom"]
+                    + " "
+                    + tournament.players[i]["Prénom"],
                     tournament.players[i]["Score"],
                     tournament.players[i]["Classement"],
-                }
+                ]
             )
-        print("\n---RESULTS---")
-        print(f"{tournament.name.upper()}", end="\n")
-        print(f"Lieu: {tournament.location.title()}", end="/n")
-        print(f"Description: {tournament.description}", end="/n")
-        print(
-            f"Date de début: {tournament.start_date} | Date de fin: {tournament.end_date}",
-            end="/n",
-        )
         print(self.table)
 
-    def offer_rankin(self):
+    def offer_ranking(self):
         print("Voulez vous modifier les classements? oui/ non:")
 
     def rank_confirm(self, p):
-        print(f"Modifier classement de joueur: {p.lastname} {p.firstname}")
-        print("Noveau rank (tapez 'q' pour retourner au menu principal):")
+        print(
+            f"\n\nModifier classement de joueur: {p.last_name.title()} {p.first_name.title()}"
+        )
+        print("Noveau rank:")
+
+    def update_rank(self):
+        print("Classement de joueur est bien modifié. Retourn au menu principal.")

@@ -42,3 +42,6 @@ class TournamentView:
 
     def no_tournament(self):
         print("\nAucun tournois est enregistré.")
+
+    def error_create_tournament(self):
+        print("\nVotre choix n'est pas valide, veuillez créer à nouveau un tournament.")

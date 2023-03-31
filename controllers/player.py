@@ -2,16 +2,23 @@ from models.player import Player
 from models import utils
 from views.player import PlayerView
 from views.menu import Menu
+from views.tournament import TournamentView
+
 
 class PlayerManager:
     def __init__(self) -> None:
         self.player_view = PlayerView()
         self.view_menu = Menu()
+        self.tournament_view = TournamentView()
+
     def return_menu(self):
         from controllers.menu import MenuManager
+
         MenuManager().start_main_menu()
+
     def create_tournament(self):
         from controllers.tournaments import TournamentManager
+
         TournamentManager().create_tournament()
 
     def create_player(self):
@@ -59,8 +66,7 @@ class PlayerManager:
         chose the option that need to be changed then save it to new
         """
         players = utils.load_players_data()
-        self.player_view.select_a_player(players, "pour modifier")
-        self.view_menu.input_prompt()
+        self.player_view.select_a_player(players, "à modifier")
         user_input = input()
         if user_input == "q":
             self.return_menu()
@@ -73,9 +79,8 @@ class PlayerManager:
             p["Prénom"],
             p["Date de naissance"],
         )
-        input_values = ["Prénom", "Nom", "Date de naissance"]
+        input_values = ["Prénom", "Nom", "Date de naissance", "Classement"]
         self.player_view.update_player_info(p, input_values)
-        self.view_menu.input_prompt()
         user_input = input()
 
         if user_input == "q":
@@ -84,7 +89,7 @@ class PlayerManager:
         elif int(user_input) <= len(input_values):
             update_info = input_values[int(user_input) - 1]
 
-            key = ["Nom", "Prénom", "Date de naissance"]
+            key = ["Nom", "Prénom", "Date de naissance", "Classement"]
             updated_info = key[int(user_input) - 1]
 
             self.view_menu.input_prompt_text(f"Nouveau {update_info}")
@@ -122,11 +127,10 @@ class PlayerManager:
         # while there are enough players in the data, chose them as number of length
         while i < total_chosen_players:
             self.player_view.select_a_player(players, i + 1)
-            self.view_menu.input_prompt()
             user_input = int(input())
+
             if user_input == "q":
                 self.create_tournament()
-
             elif user_input in list_ids:
                 index = list_ids.index(user_input)
                 tour_players.append(players[index])
@@ -143,5 +147,4 @@ class PlayerManager:
                 else:
                     self.view_menu.error_msg()
                     self.create_tournament()
-
         return tour_players

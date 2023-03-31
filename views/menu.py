@@ -13,8 +13,7 @@ class Menu:
             print(choice, choices[choice]["text"])
 
     def input_prompt(self):
-        print("\nSelectionnez votre choix: ", end="\n")
-        print("Tapez q pour retourner à étape précedente")
+        print("\nSelectionnez votre choix:")
 
     def player_selected_error(self):
         print(

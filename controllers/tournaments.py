@@ -1,6 +1,7 @@
 from views.round import RoundView
 from views.menu import Menu
 from views.tournament import TournamentView
+from views.player import PlayerView
 from models.round import Round
 from models.match import Match
 from models.tournament import Tournament
@@ -18,6 +19,7 @@ class TournamentManager:
         self.tournament_view = TournamentView()
         self.player_controller = PlayerManager()
         self.report_controller = RaportManager()
+        self.player_view = PlayerView()
 
     def create_tournament(self):
         """------------- create a tournament and save it to db -----------------"""
@@ -79,7 +81,7 @@ class TournamentManager:
                 self.view_menu.error_msg()
                 self.back_to_menu()
         else:
-            self.view_menu.error_msg()
+            self.tournament_view.error_create_tournament()
             self.create_tournament()
 
     def resume_tournament(self):
@@ -93,6 +95,7 @@ class TournamentManager:
         while tournament.current_round <= tournament.number_of_rounds:
             self.next_round(tournament)
             tournament.current_round += 1
+            tournament.end_date = utils.set_date_time()
             tournament.update_tournament()
 
     def start_tournament(self, tournament):
@@ -106,7 +109,6 @@ class TournamentManager:
             self.continue_rounds(tournament)
         elif 1 < tournament.current_round <= tournament.number_of_rounds:
             self.continue_rounds(tournament)
-            tournament.end_date = utils.set_date_time()
             self.tournament_end(tournament)
         elif tournament.current_round > tournament.number_of_rounds:
             self.tournament_end(tournament)
@@ -121,14 +123,11 @@ class TournamentManager:
         self.round_view.display_matches(round.matches)
         self.round_view.finish_round()
         user_input = input().lower()
-        scores_list = []
 
         match user_input:
             case "oui":
                 round.end_date = utils.set_date_time()
                 tournament.rounds.append(self.set_round(round))
-
-                self.end_of_round(tournament)
 
             case "non":
                 self.first_round(tournament)
@@ -171,9 +170,8 @@ class TournamentManager:
                 bottom_players[i]["Score"],
             )
             self.add_play_with(top_players[i], bottom_players[i])
-            pairs = m.set_pairs()
 
-            matches.append(pairs)
+            matches.append(m)
 
         return matches
 
@@ -220,10 +218,9 @@ class TournamentManager:
             else:
                 m = Match(player_1, player_2, player_1["Score"], player_2["Score"])
                 self.add_play_with(player_1, player_2)
-                pairs = m.set_pairs()
                 sorted_players.append(player_1)
                 sorted_players.append(player_2)
-                matches.append(pairs)
+                matches.append(m)
         return matches
 
     def add_play_with(self, player1, player2):
@@ -240,73 +237,65 @@ class TournamentManager:
         return matches
 
     def set_round(self, round):
-        return round.get_serialized_round()
+        matches = self.end_of_round(round)
+        return round.get_serialized_round(matches)
 
-    def end_of_round(self, tournament):
-        for i in range(tournament.number_of_rounds):
+    def end_of_round(self, round):
+        """return matches from score options of each round"""
+        new_matches = []
+        # for i in range(tournament.number_of_rounds):
+        i = 0
+        for m in round.matches:
             self.round_view.scores_options(i + 1)
-            matches = tournament.rounds[i]["List des matchs"]
-            for m in range(len(matches)):
-                player1 = matches[m][0][0]
-                player2 = matches[m][1][0]
-                score_player1 = matches[m][0][1]
-                score_player2 = matches[m][1][1]
+            new_match = self.score_options(m)
+            pairs = new_match.set_pairs()
+            new_matches.append(pairs)
+            i += 1
+        round.matches = new_matches
+        return round.matches
 
-                self.score_options(player1, player2, score_player1, score_player2)
-                breakpoint()
-
-        # tournament.players = self.update_scores_player(
-        #     tournament.players, matches_players
-        # )
-
-    # def update_scores_player(self, players, matches_players):
-    #     for p in matches_players:
-    #         noveau_score = p["Score"] + players[players.index(p)]["Score"]
-    #         players[players.index(p)]["Score"] = noveau_score
-    #     return players
-
-    # def update_scores(self, matches, score):
-    #     for score in matches:
-    #         for i in range(len(score)):
-    #             score[i][1] = score
-    #     return score
-
-    def score_options(self, player1, player2, score_player1, score_player2):
+    def score_options(self, match_test):
+        """----return object matc with the score that has been changed by user input---"""
         res = input()
         match res:
             case "1":
-                player1["Score"] += 1.0
-                score_player1 += 1.0
+                match_test.player_1["Score"] += 1.0
+                match_test.score_1 += 1.0
+                return match_test
             case "2":
-                player2["Score"] += 1.0
-                score_player2 += 1.0
-
+                match_test.player_2["Score"] += 1.0
+                match_test.score_2 += 1.0
+                return match_test
             case "3":
-                player1["Score"] += 0.5
-                score_player1 += 0.5
-                player1["Score"] += 0.5
-                score_player1 += 0.5
-
+                match_test.player_1["Score"] += 0.5
+                match_test.score_1 += 0.5
+                match_test.player_2["Score"] += 0.5
+                match_test.score_2 += 0.5
+                return match_test
             case "q":
                 self.back_to_menu()
             case _:
                 self.round_view.erreur_scores_option()
-                self.score_options(player1, player2, score_player1, score_player2)
+                self.score_options(match_test)
 
     def tournament_end(self, tournament):
         """
         -----display final result of the tournament----
+        this only return at the end of all round
         offer user to update rank
         """
         players = tournament.players
         players.sort(key=itemgetter("Score"), reverse=True)
         self.round_view.display_result(tournament)
-        self.round_view.offer_rankin()
+        self.round_view.offer_ranking()
         user_input = input().lower()
         try:
             if user_input == "oui":
                 self.update_rank(players)
             elif user_input == "non":
+                self.back_to_menu()
+            else:
+                self.view_menu.error_msg()
                 self.back_to_menu()
         except KeyError:
             self.view_menu.error_msg()
@@ -314,13 +303,14 @@ class TournamentManager:
 
     def update_rank(self, players):
         """-----update players rank---------"""
-        self.player_controller.select_players(players, "to update")
+        players.sort(key=itemgetter("id"))
+        self.player_view.select_a_player(players, "to update")
         self.view_menu.input_prompt()
         user_input = input()
         if user_input == "q":
             self.back_to_menu()
         for i in range(len(players)):
-            if int(user_input) == players[i]["Joueur_id"]:
+            if int(user_input) == players[i]["id"]:
                 player = players[players.index(players[i])]
                 player = Player(
                     player["Joueur_id"],
@@ -329,13 +319,12 @@ class TournamentManager:
                     player["Date de naissance"],
                 )
                 self.round_view.rank_confirm(player)
-                user_input = input()
-                if user_input == "non":
-                    self.back_to_menu()
-                elif user_input == "oui":
-                    player.update_player(int(user_input), "Classement")
-                    players[i]["Classement"] = int(user_input)
-                    return players
+                rank_input = int(input())
+                player.update_player(rank_input, "Classement")
+                players[i]["Classement"] = rank_input
+                self.round_view.update_rank()
+                self.back_to_menu()
+                return players
 
     def back_to_menu(self):
         from controllers.menu import MenuManager

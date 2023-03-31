@@ -27,11 +27,11 @@ class Round:
     def __str__(self) -> str:
         pass
 
-    def get_serialized_round(self):
+    def get_serialized_round(self, matches):
         serialized_round = {
             "Nom": self.name,
             "Date de début": self.start_date,
             "Date de fin": self.end_date,
-            "List des matchs": self.matches,
+            "List des matchs": matches,
         }
         return serialized_round

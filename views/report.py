@@ -10,6 +10,7 @@ class ReportView:
             "Prénom",
             "Date de naissance",
             "Scores",
+            "Classement",
         ]
         self.tournament_report_field_names = [
             "Nom",
@@ -39,7 +40,9 @@ class ReportView:
     def display_players(self, players):
         self.table.clear()
         self.table.field_names = self.players_report_feild_names
+        self.table.title = "---JOUEURS AVEC LES NOMS TRIES PAR ORDRE ALPHABETIQUE---"
         self.table.align = "l"
+        self.table.sortby = "Nom"
         for i in range(len(players)):
             self.table.add_row(
                 [
@@ -48,15 +51,17 @@ class ReportView:
                     players[i]["Prénom"],
                     players[i]["Date de naissance"],
                     players[i]["Score"],
+                    players[i]["Classement"],
                 ]
             )
-        self.table.sortby = "Nom"
-        print("\n---JOUEURS AVEC LES NOMS TRIES PAR ORDRE ALPHABETIQUE---")
+
+        print("\n")
         print(self.table)
 
     def display_all_tournaments(self, tournaments):
         self.table.clear()
         self.table.field_names = self.tournament_report_field_names
+        self.table.title = "---LES TOURNOIS---"
         self.table.align = "l"
 
         for i in range(len(tournaments)):
@@ -79,17 +84,31 @@ class ReportView:
                     players_for_table,
                 ]
             )
-        print("\n\n---LES TOURNOIS---")
+        print("\n\n")
         print(self.table)
 
     def display_one_tournament(self, tournament):
         self.table.clear()
-        self.table.field_names = ["Nom", "Date de début", "Date de fin"]
+        self.table.field_names = self.tournament_report_field_names
+        self.table.title = f"---{tournament.name.upper()}---"
         self.table.align = "l"
+        players_in_tournament = []
+        for player in tournament.players:
+            name = f"{player['Nom']} {player['Prénom']}"
+            players_in_tournament.append(name)
+        players_for_table = "\n".join(players_in_tournament)
         self.table.add_row(
-            [tournament.name, tournament.start_date, tournament.end_date]
+            [
+                tournament.name,
+                tournament.location,
+                tournament.description,
+                tournament.start_date,
+                tournament.end_date,
+                str(tournament.current_round - 1),
+                players_for_table,
+            ]
         )
-        print(f"\n\n---{tournament.name.upper()}---")
+        print("\n\n")
         print(self.table)
 
     def display_players_one_tournament(self, tournament):
@@ -98,10 +117,12 @@ class ReportView:
         print("\n---ET---")
         self.display_players(players)
 
+    def title_rounds_matchs_report(self, tournament):
+        print(f"\n\n---LES TOURS DE {tournament.name.upper()}", end=" | ")
+        print(f"{tournament.location.upper()}", end=" | ")
+        print(f"{tournament.start_date.upper()}---", end="\n\n")
+
     def display_rounds_matches(self, tournament, rounds):
-        self.display_one_tournament(tournament)
-        print("\n")
-        print(f"\n---LES TOURS DE {tournament.name.upper()} ")
         self.display_rounds(rounds)
         print("\n")
         for i in range(len(rounds)):
@@ -141,6 +162,6 @@ class ReportView:
         print(self.table)
 
     def final_menu(self):
-        print("\n Voulez vous retourner au:", end="\n")
+        print("\nVoulez vous retourner au:", end="\n")
         print("1: Menu des raports")
         print("2: Menu principal")
