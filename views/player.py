@@ -1,6 +1,3 @@
-from models import utils
-
-
 class PlayerView:
     def __init__(self) -> None:
         pass
