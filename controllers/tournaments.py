@@ -21,6 +21,29 @@ class TournamentManager:
         self.report_controller = RaportManager()
         self.player_view = PlayerView()
 
+    def check_input(self, info, user_input):
+        if info == "Date de debut":
+            if self.view_menu.verify_date(user_input):
+                return user_input
+            else:
+                self.view_menu.text_not_valide()
+                user_input = utils.set_date_time()
+       
+        if info == "Nombre des jouers (8 par default)":
+            if user_input.isnumeric():
+                user_input = int(user_input)
+            else:
+                self.view_menu.text_not_valide()
+                user_input = int(8)
+        if info == "Nombre de tour (4 par default)":
+            if user_input.isnumeric():
+                user_input = int(user_input)
+            else:
+                self.view_menu.text_not_valide()
+                user_input = int(4)
+        
+        return user_input
+
     def create_tournament(self):
         """------------- create a tournament and save it to db -----------------"""
         self.tournament_view.tournament_title()
@@ -30,23 +53,25 @@ class TournamentManager:
             "Lieu",
             "Description",
             "Date de debut",
-            "Nombre des jouers (8 par default))",
+            "Nombre des jouers (8 par default)",
             "Nombre de tour (4 par default)",
         ]
         for info in infos:
             self.view_menu.input_prompt_text(info)
             user_input = input()
+            
             if user_input == "q":
                 self.back_to_menu()
             else:
+                user_input = self.check_input(info, user_input)
                 tournament_info.append(user_input)
         # check if the input has no return values, return value by default where it isn't
-        if tournament_info[3] == "":
-            tournament_info[3] = utils.set_date_time()
-        if tournament_info[4] == "":
-            tournament_info[4] = int(8)
-        if tournament_info[5] == "":
-            tournament_info[5] = int(4)
+        # if tournament_info[3] == "":
+        #     tournament_info[3] = utils.set_date_time()
+        # if tournament_info[4] == "":
+        #     tournament_info[4] = int(8)
+        # if tournament_info[5] == "":
+        #     tournament_info[5] = int(4)
 
         # select players and add to players lists. Min 8 players as min 4 tours to begin a tournament
         tour_players = self.player_controller.select_players(tournament_info[4])

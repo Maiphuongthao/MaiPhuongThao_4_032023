@@ -38,3 +38,16 @@ class Menu:
 
     def not_valide(self):
         print("\nVotre choix n'est pas valide. Veuillez choisir un bon option: ")
+
+    def text_not_valide(self):
+        print("---Votre info n'est pas correct, valeur est mis à default valeur---")
+
+    def verify_date(self, value_to_test):
+        if "/" not in value_to_test:
+            return False
+        else:
+            splitted_date = value_to_test.split("/")
+            for date in splitted_date:
+                if not date.isnumeric():
+                    return False
+            return True
