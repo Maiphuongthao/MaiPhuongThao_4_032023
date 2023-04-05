@@ -21,6 +21,15 @@ class PlayerManager:
 
         TournamentManager().create_tournament()
 
+    def check_input(self, info, user_input):
+        if info == "Date de naissance":
+            if self.view_menu.verify_date(user_input):
+                return user_input
+            else:
+                self.view_menu.text_not_valide()
+                user_input = "01/01/01"
+        return user_input
+
     def create_player(self):
         self.player_view.create_player_title()
         player_infos = []
@@ -28,14 +37,16 @@ class PlayerManager:
             "Jouer id",
             "Nom",
             "Prénom",
-            "Naissance (dd/mm/yyy)",
+            "Date de naissance",
         ]
         for i in info_values:
             self.view_menu.input_prompt_text(i)
             user_input = input()
+
             if user_input == "q":
                 self.return_menu()
             else:
+                user_input = self.check_input(i, user_input)
                 player_infos.append(user_input)
 
         self.player_view.review_player(player_infos)
