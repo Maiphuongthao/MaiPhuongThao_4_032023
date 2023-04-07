@@ -115,5 +115,3 @@ class MenuManager:
             case _:
                 self.view_menu.error_msg()
                 self.start_main_menu()
-    
-    
