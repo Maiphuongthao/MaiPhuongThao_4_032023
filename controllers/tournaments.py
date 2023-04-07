@@ -28,7 +28,6 @@ class TournamentManager:
             else:
                 self.view_menu.text_not_valide()
                 user_input = utils.set_date_time()
-       
         if info == "Nombre des jouers (8 par default)":
             if user_input.isnumeric():
                 user_input = int(user_input)
@@ -41,7 +40,6 @@ class TournamentManager:
             else:
                 self.view_menu.text_not_valide()
                 user_input = int(4)
-        
         return user_input
 
     def create_tournament(self):
@@ -59,7 +57,6 @@ class TournamentManager:
         for info in infos:
             self.view_menu.input_prompt_text(info)
             user_input = input()
-            
             if user_input == "q":
                 self.back_to_menu()
             else:
